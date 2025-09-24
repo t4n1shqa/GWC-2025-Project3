@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Piece of Cake!</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center; 
+        align-items: center;     
+        background: #ffffff;    
+      }
+      canvas {
+        display: block;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      class CakeStack extends Phaser.Scene {
+        constructor() {
+          super('CakeStack');
+        }
+
+        preload() {
+          // cake images here
+        }
+
+        create() {
+        }
+
+        update(time, delta) {
+        }
+
+        placeBlock() {
+        }
+              
+        gameOver() {
+        }
+      }
+
+      const config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 800,
+        backgroundColor: '#d9ffff',
+        scene: CakeStack,
+      };
+
+      new Phaser.Game(config);
+    </script>
+  </body>
+</html>
