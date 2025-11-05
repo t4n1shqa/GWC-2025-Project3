@@ -303,26 +303,6 @@ class GameScene extends Phaser.Scene {
       }
     });
   }
-
-  
-    // Makes stack and table move
-    if (this.score % 100 == 0 && !this.moving){
-      this.moving = true;
-      this.direction = Math.random() > 0.5 ? 1 : -1;
-    }
-
-    if(this.moving){
-      const speed = 2;
-      this.stackedBlocks.x += this.direction * speed;
-
-      if (this.stackedBlocks.x >= 50 || this.stackedBlocks.x <= -50) {
-        this.direction *= -1;
-      }
-    }
-
-    if(this.score % 100 !== 0){
-      this.moving = false;
-    }
         
   gameOver() {
     this.isGameOver = true;
