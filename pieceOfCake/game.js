@@ -4,8 +4,18 @@ class StartScene extends Phaser.Scene {
     super('StartScene');
   }
 
+   preload() {
+    this.load.image('background', 'assets/background.png');
+    this.load.image('cake1', 'assets/cake_1_final.png');
+    this.load.image('cake2', 'assets/cake_2_render.png');
+    this.load.image('cake3', 'assets/cake_3_final.png');
+    // cake images can be loaded here later
+   }
+
+
   create() {
     // Title
+    this.add.image(400, 390, 'background');
     this.add.text(400, 200, 'PIECE OF CAKE!', {
       fontSize: '72px',
       fill: '#ff6b9d',
@@ -31,13 +41,21 @@ class StartScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Start button
-    const startButton = this.add.rectangle(400, 500, 250, 70, 0xff6b9d);
-    startButton.setStrokeStyle(4, 0x000000);
+
+    let stand = this.add.image(409, 495, 'cake1');
+    stand.setScale(0.5);
+    stand.setOrigin(0.5,0.5);
+
+    const startButton = stand;
+    //startButton.setStrokeStyle(4, 0x000000);
     startButton.setInteractive({ useHandCursor: true });
+    
 
     const buttonText = this.add.text(400, 500, 'START GAME', {
       fontSize: '32px',
-      fill: '#ffffff',
+      fill: '#b6603eff',
+      stroke: '#000000ff',
+      strokeThickness: 5,
       fontFamily: 'Arial',
       fontStyle: 'bold'
     }).setOrigin(0.5);
@@ -59,7 +77,9 @@ class StartScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-SPACE', () => {
       this.scene.start('GameScene');
     });
+
   }
+  
 }
 
 // Game Scene
@@ -69,6 +89,25 @@ class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image('background', 'assets/background.png');
+    this.load.image('stand','assets/stand.png');
+
+    // cake images can be loaded here later
+  }
+
+  create() {
+    this.add.image(400, 390, 'background');
+    //this.add.image(400,390,'stand');
+    
+    let stand = this.add.image(400, 450, 'stand');
+    //stand.setScale(1.5);
+    //stand.setOrigin(0.5,0.5);
+
+  
+    // Game variables
+    this.score = 0;
+    this.blockHeight = 30;
+    this.blockWidth = 200;
     this.load.image('cake1', 'images/cake1.png');
     this.load.image('cake2', 'images/cake2.png');
     this.load.image('cake3', 'images/cake3.png');
@@ -273,6 +312,7 @@ class GameScene extends Phaser.Scene {
     }
     
     // Increase difficulty
+    this.speed = Math.min(400, this.speed + 5);
     if (this.score % 50 == 0){
       this.speed = Math.min(400, this.speed + 75);
     }
@@ -316,9 +356,14 @@ class GameOverScene extends Phaser.Scene {
     super('GameOverScene');
   }
 
+  
+
   create(data) {
     // Background
-    this.add.rectangle(400, 400, 800, 800, 0xd9ffff);
+
+    this.add.image(400, 390, 'background');
+        
+    // this.add.rectangle(400, 400, 800, 800, 0xd9ffff);
 
     // Game over text
     this.add.text(400, 250, 'GAME OVER', {
@@ -339,13 +384,23 @@ class GameOverScene extends Phaser.Scene {
     }).setOrigin(0.5);
     
     // Play again button
-    const button = this.add.rectangle(400, 500, 250, 70, 0x4CAF50);
-    button.setStrokeStyle(4, 0x000000);
-    button.setInteractive({ useHandCursor: true });
+    //const button = this.add.image(400, 500, 250, 70, 0x4CAF50);
+    //button.setStrokeStyle(4, 0x000000);
+    //button.setInteractive({ useHandCursor: true });
+
+    let button= this.add.image(410, 493, 'cake2');
+    button.setScale(0.5);
+    button.setOrigin(0.5,0.5);
+
+    const endButton = button;
+    //startButton.setStrokeStyle(4, 0x000000);
+    endButton.setInteractive({ useHandCursor: true });
     
-    const buttonText = this.add.text(400, 500, 'PLAY AGAIN', {
+    const buttonText = this.add.text(410, 500, 'PLAY AGAIN', {
       fontSize: '32px',
-      fill: '#ffffff',
+      fill: '#b6603eff',
+      stroke: '#000000ff',
+      strokeThickness: 5,
       fontFamily: 'Arial',
       fontStyle: 'bold'
     }).setOrigin(0.5);
@@ -364,13 +419,23 @@ class GameOverScene extends Phaser.Scene {
     });
 
     // Main menu button
-    const menuButton = this.add.rectangle(400, 600, 250, 70, 0xff6b9d);
-    menuButton.setStrokeStyle(4, 0x000000);
-    menuButton.setInteractive({ useHandCursor: true });
+    //const menuButton = this.add.rectangle(400, 600, 250, 70, 0xff6b9d);
+    //menuButton.setStrokeStyle(4, 0x000000);
+    //menuButton.setInteractive({ useHandCursor: true });
+
+    let menuButton= this.add.image(408, 590, 'cake3');
+    menuButton.setScale(0.51);
+    menuButton.setOrigin(0.5,0.5);
+
+    const menButton = menuButton;
+    //startButton.setStrokeStyle(4, 0x000000);
+    menButton.setInteractive({ useHandCursor: true });
     
-    const menuText = this.add.text(400, 600, 'MAIN MENU', {
+    const menuText = this.add.text(408, 600, 'MAIN MENU', {
       fontSize: '32px',
-      fill: '#ffffff',
+      fill: '#b6603eff',
+      stroke: '#000000ff',
+      strokeThickness: 5,
       fontFamily: 'Arial',
       fontStyle: 'bold'
     }).setOrigin(0.5);
