@@ -9,17 +9,13 @@ class StartScene extends Phaser.Scene {
     this.load.image('cake1', 'assets/cake_1_final.png');
     this.load.image('cake2', 'assets/cake_2_render.png');
     this.load.image('cake3', 'assets/cake_3_final.png');
-
-
-
     // cake images can be loaded here later
-  }
+   }
+
 
   create() {
     // Title
     this.add.image(400, 390, 'background');
-
-
     this.add.text(400, 200, 'PIECE OF CAKE!', {
       fontSize: '72px',
       fill: '#ff6b9d',
@@ -36,7 +32,7 @@ class StartScene extends Phaser.Scene {
       fontFamily: 'Arial'
     }).setOrigin(0.5);
 
-    // Instructions 
+    // Instructions
     this.add.text(400, 380, 'Click or press SPACE to stack', {
       fontSize: '20px',
       fill: '#666',
@@ -112,12 +108,53 @@ class GameScene extends Phaser.Scene {
     this.score = 0;
     this.blockHeight = 30;
     this.blockWidth = 200;
+    this.load.image('cake1', 'images/cake1.png');
+    this.load.image('cake2', 'images/cake2.png');
+    this.load.image('cake3', 'images/cake3.png');
+    this.load.image('cake4', 'images/cake4.png');
+    
+    // Error handling
+    this.load.on('loaderror', (file) => {
+      console.error('Failed to load:', file.src);
+    });
+    
+    // After loading, scale down the textures
+    this.load.on('complete', () => {
+      ['cake1', 'cake2', 'cake3', 'cake4'].forEach(key => {
+        const texture = this.textures.get(key);
+        const source = texture.getSourceImage();
+        
+        // Create a scaled down version
+        const canvas = document.createElement('canvas');
+        //const scaleX = 310 / source.width;
+        //const scaleY = 110 / source.height;
+        //const scale = Math.max(scaleX, scaleY); // Use max to cover the area
+        
+        //canvas.width = source.width * scale;
+        //canvas.height = source.height * scale;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+        
+        // Replace the texture with scaled version
+        this.textures.remove(key);
+        this.textures.addCanvas(key, canvas);
+      });
+    });
+  }
+
+  create() {
+    // Game variables
+    this.score = 0;
+    this.blockHeight = 150;
+    this.blockWidth = 300;
     this.baseY = 700;
     this.direction = 1;
     this.speed = 200;
     this.stackedBlocks = [];
     this.isGameOver = false;
     this.cameraOffset = 0;
+    this.cakeImages = ['cake1', 'cake2', 'cake3', 'cake4'];
     
     // Score text
     this.scoreText = this.add.text(400, 40, 'Score: 0', {
@@ -128,9 +165,9 @@ class GameScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.scoreText.setScrollFactor(0);
     
-    // Create base block
-    const baseBlock = this.add.rectangle(400, this.baseY, this.blockWidth, this.blockHeight, 0xff6b9d);
-    baseBlock.setStrokeStyle(2, 0x000000);
+    // Create base block using tileSprite for proper cropping
+    const baseBlock = this.add.tileSprite(400, this.baseY, this.blockWidth, this.blockHeight, 'cake1');
+    
     this.stackedBlocks.push({
       x: 400,
       y: this.baseY,
@@ -152,11 +189,15 @@ class GameScene extends Phaser.Scene {
     const lastBlock = this.stackedBlocks[this.stackedBlocks.length - 1];
     const newY = lastBlock.y - this.blockHeight;
     
-    this.movingBlock = this.add.rectangle(0, newY, this.blockWidth, this.blockHeight, 0xff6b9d);
-    this.movingBlock.setStrokeStyle(2, 0x000000);
+    // Pick a random cake image
+    const randomCake = Phaser.Utils.Array.GetRandom(this.cakeImages);
+    
+    this.movingBlock = this.add.tileSprite(0, newY, this.blockWidth, this.blockHeight, randomCake);
     
     this.direction = Math.random() > 0.5 ? 1 : -1;
     this.movingBlock.x = this.direction === 1 ? 0 : 800;
+    
+    console.log('Created moving block at y:', newY); // Debug log
   }
 
   update(time, delta) {
@@ -206,7 +247,7 @@ class GameScene extends Phaser.Scene {
     
     // Update moving block to stacked position
     this.movingBlock.x = newCenterX;
-    this.movingBlock.displayWidth = overlapWidth;
+    this.movingBlock.width = overlapWidth;  // Use width instead of displayWidth for tileSprite
     
     // Add to stacked blocks
     this.stackedBlocks.push({
@@ -272,6 +313,9 @@ class GameScene extends Phaser.Scene {
     
     // Increase difficulty
     this.speed = Math.min(400, this.speed + 5);
+    if (this.score % 50 == 0){
+      this.speed = Math.min(400, this.speed + 75);
+    }
     
     this.movingBlock = null;
     
@@ -282,9 +326,9 @@ class GameScene extends Phaser.Scene {
   }
   
   createFallingPiece(x, y, width) {
-    const color = this.movingBlock ? this.movingBlock.fillColor : 0xff6b9d;
-    const fallingPiece = this.add.rectangle(x, y, width, this.blockHeight, color);
-    fallingPiece.setStrokeStyle(2, 0x000000);
+    // Use the texture from the moving block if available
+    const texture = this.movingBlock ? this.movingBlock.texture.key : 'cake1';
+    const fallingPiece = this.add.tileSprite(x, y, width, this.blockHeight, texture);
     
     // Falling and fading animation
     this.tweens.add({
@@ -415,7 +459,6 @@ class GameOverScene extends Phaser.Scene {
     });
   }
 }
-
 
 // Phaser Configuration
 const config = {
