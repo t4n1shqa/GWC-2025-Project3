@@ -17,6 +17,15 @@ class StartScene extends Phaser.Scene {
 
 
  create() {
+
+  if (!this.sound.get('bgm')) {
+    this.bgm = this.sound.add('bgm', {
+        loop: true,
+        volume: 0.2
+    });
+    this.bgm.play();
+  }
+
    this.bgm = this.sound.add('bgm', {
        loop: true,
        volume: 0.2
@@ -29,29 +38,32 @@ class StartScene extends Phaser.Scene {
   
    // Title
    this.add.text(400, 200, 'PIECE OF CAKE!', {
-     fontSize: '72px',
-     fill: '#ff6b9d',
-     fontFamily: 'Arial',
-     fontStyle: 'bold',
-     stroke: '#ffffff',
-     strokeThickness: 8
+     fontSize: '50px',
+      fill: '#c54e2aff',
+      fontFamily: '"Press Start 2P"',
+      fontStyle: 'bold',
+      stroke: '#ffcdb6ff',
+      strokeThickness: 7
    }).setOrigin(0.5);
 
 
    // Subtitle
    this.add.text(400, 300, 'Stack the cakes as high as you can!', {
-     fontSize: '24px',
-     fill: '#6d2b4bff',
-     fontFamily: 'Arial'
+     fontSize: '28px',
+    fill: '#c54e2aff',
+    stroke: '#ffcdb6ff',
+    strokeThickness: 3,
+    fontFamily: '"Bubblegum Sans"',
+    fontStyle: 'italic'
    }).setOrigin(0.5);
 
 
    // Instructions
    this.add.text(400, 380, 'Click or press SPACE to stack', {
-     fontSize: '20px',
-     fill: '#94426bff',
-     fontFamily: 'Arial',
-     fontStyle: 'italic'
+     fontSize: '24px',
+    fill: '#9b372bff',
+    fontFamily: '"Gloria Hallelujah"',
+    fontStyle: 'Bold Italic'
    }).setOrigin(0.5);
 
 
@@ -86,6 +98,15 @@ class StartScene extends Phaser.Scene {
  }
 }
 
+//get high score!
+
+    function getHighScore() {
+      return parseInt(localStorage.getItem('highScore')) || 0;
+    }
+
+    function setHighScore(score) {
+      localStorage.setItem('highScore', score);
+    }
 
 // Game Scene
 class GameScene extends Phaser.Scene {
@@ -129,6 +150,7 @@ class GameScene extends Phaser.Scene {
    this.cameraOffset = 0;
    this.cakeImages = ['cake1', 'cake2', 'cake3', 'cake4'];
    this.wobbleIntensity = 0; // Track wobble intensity
+   this.perfectStreak = 0;
 
 
    // Darkening Overlay
@@ -184,6 +206,12 @@ class GameScene extends Phaser.Scene {
   
    // Pick a random cake image
    const randomCake = Phaser.Utils.Array.GetRandom(this.cakeImages);
+
+   // NEW: apply width bonus based on perfect streak
+    //let width = this.initialBlockWidth;
+    //if (this.perfectStreak >= 2) {
+        //width = Math.min(lastBlock.width + 7, this.initialBlockWidth);
+    //}
   
    // Always create at FULL width
    //this.movingBlock = this.add.tileSprite(0, newY, this.initialBlockWidth, this.blockHeight, randomCake);
@@ -191,7 +219,7 @@ class GameScene extends Phaser.Scene {
 
    // Create block using the width of the last stacked cake
    this.movingBlock = this.add.tileSprite(0, newY, lastBlock.width, this.blockHeight, randomCake);
-
+   //this.movingBlock = this.add.tileSprite(0, newY, width, this.blockHeight, randomCake);
 
    // Apply tint to moving block
    this.movingBlock.setTint(this.calculateTint());
@@ -232,9 +260,8 @@ class GameScene extends Phaser.Scene {
  }
 
 
-
-
  placeBlock() {
+
    this.sound.play('squish', { volume: 1.0 });
    if (this.isGameOver || !this.movingBlock) return;
   
@@ -272,6 +299,15 @@ class GameScene extends Phaser.Scene {
    }
   
    const newCenterX = (leftEdge + rightEdge) / 2;
+
+   // NEW: Detect perfect placement
+    const isPerfect = Math.abs(newCenterX - lastBlock.x) < 5; // 3px tolerance
+    if (isPerfect) {
+        this.perfectStreak++; // increment streak
+        this.playPerfectEffect(movingY); // trigger perfect animation
+    } else {
+        this.perfectStreak = 0; // reset streak
+    }
   
    // Left overhang - check if the moving block extends past the left edge
    //const movingBlockLeft = movingX - this.initialBlockWidth / 2;
@@ -394,6 +430,15 @@ class GameScene extends Phaser.Scene {
      }
    }
 
+   /*
+   if (isPerfect) {
+    this.movingBlock.width = Math.min(
+      this.movingBlock.width + 20,
+      this.initialBlockWidth
+    );
+  }
+    */
+
 
    this.movingBlock = null;
   
@@ -401,7 +446,35 @@ class GameScene extends Phaser.Scene {
    this.time.delayedCall(200, () => {
      this.createMovingBlock();
    });
+
  }
+
+ playPerfectEffect(yPosition) {
+    if (this.perfectStreak < 2) return; // only after 2+ perfects
+
+    const glow = this.add.rectangle(
+        400, 
+        yPosition + this.blockHeight / 2, 
+        this.blockWidth, 
+        10, 
+        0xffd700 // gold
+    );
+    glow.setOrigin(0.5);
+
+    this.tweens.add({
+        targets: glow,
+        scaleX: 1.4,
+        scaleY: 2,
+        alpha: 0,
+        duration: 250,
+        ease: 'Quad.easeOut',
+        onComplete: () => {
+            glow.destroy();
+        }
+    });
+}
+
+
   createFallingPiece(x, y, width) {
    if (width <= 0.5) return; // nothing to show
    width = Math.max(2, width); // ensure minimum visible width
@@ -450,6 +523,11 @@ class GameOverScene extends Phaser.Scene {
    this.load.image('background', 'assets/background.png');
    this.load.image('cake-2', 'assets/cake_2_render.png');
    this.load.image('cake-3', 'assets/cake_3_final.png');
+
+   // load 3 frames for sprinkle animation
+    this.load.image('sprinkles1', 'ani/s1.png');
+    this.load.image('sprinkles2', 'ani/s2.png');
+    this.load.image('sprinkles3', 'ani/s3.png');
  }
 
 
@@ -457,12 +535,54 @@ class GameOverScene extends Phaser.Scene {
    // Background
    this.add.image(400, 400, 'background');
 
+   // --- HIGH SCORE LOGIC ---
+  let previousHighScore = getHighScore();
+  let isNewHighScore = data.score > previousHighScore;
+
+  // Save new high score if beaten
+  if (isNewHighScore) {
+    setHighScore(data.score);
+  }
+
+  // Choose correct value to DISPLAY
+  let highScoreToShow = isNewHighScore ? data.score : previousHighScore;
+
+  // --- Sprinkle Animation ONLY for new high score ---
+  if (isNewHighScore) {
+    this.anims.create({
+      key: 'sprinkleAnim1',
+      frames: [
+        { key: 'sprinkles1' },
+        { key: 'sprinkles2' },
+        { key: 'sprinkles3' }
+      ],
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.sprinkle1 = this.add.sprite(400, 400, 'sprinkles1')
+      .setScale(2)
+      .setOrigin(0.5);
+    this.sprinkle1.play('sprinkleAnim1');
+  }
+
+  // High score text (FIXED)
+  this.add.text(400, 410, 'High Score: ' + highScoreToShow, {
+    fontSize: '32px',
+    fill: '#fff267ff',
+    stroke: '#c5a042ff',
+    strokeThickness: 5,
+    fontFamily: '"Coiny"',
+    fontStyle: 'bold'
+  }).setOrigin(0.5);
+
+
 
    // Game over text
    this.add.text(400, 250, 'GAME OVER', {
      fontSize: '72px',
      fill: '#ff0000',
-     fontFamily: 'Arial',
+     fontFamily: '"Press Start 2P"',
      fontStyle: 'bold',
      stroke: '#ffffff',
      strokeThickness: 8
