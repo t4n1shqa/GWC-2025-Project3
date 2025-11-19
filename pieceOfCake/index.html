@@ -17,20 +17,37 @@
     <meta charset="UTF-8" />
     <title>My Phaser Game</title>
 
-    <!-- Load the WebFont loader -->
+ <!-- Google WebFont Loader -->
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 
     <script>
       WebFont.load({
         google: {
-          families: ['Press Start 2P']  // 👈 the font you want
+          families: [
+            'Press Start 2P',
+            'Gloria Hallelujah',
+            'Bubblegum Sans'
+          ]
         }
       });
     </script>
   </head>
 
   <body>
-    <script src="phaser.js"></script>
-    <script src="main.js"></script>
+    <!-- Your Game Code -->
+    <script src="game.js"></script>
   </body>
 </html>
+
+  <!-- ⭐ Fun Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Fredoka+One&display=swap" rel="stylesheet">
+
+  <style>
+    /* Optional: fallback styling */
+    body {
+      margin: 0;
+      background: #d9ffff;
+      font-family: 'Fredoka One', sans-serif;
+    }
+  </style>
+

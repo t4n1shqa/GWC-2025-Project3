@@ -4,18 +4,6 @@ class StartScene extends Phaser.Scene {
     super('StartScene');
   }
 
-<<<<<<< Updated upstream
-   preload() {
-    this.load.image('background', 'assets/background.png');
-    this.load.image('cake1', 'assets/cake_1_final.png');
-    this.load.image('cake2', 'assets/cake_2_render.png');
-    this.load.image('cake3', 'assets/cake_3_final.png');
-    // cake images can be loaded here later
-   }
-
-
-  create() {
-=======
   preload(){
     this.load.image('background', 'assets/background.png');
     this.load.image('cake-1', 'assets/cake_1_final.png');
@@ -27,55 +15,46 @@ class StartScene extends Phaser.Scene {
     // Background
     this.add.image(400, 400, 'background');
     
->>>>>>> Stashed changes
     // Title
     this.add.image(400, 390, 'background');
     this.add.text(400, 200, 'PIECE OF CAKE!', {
       fontSize: '50px',
-      fill: '#db4c21ff',
+      fill: '#c54e2aff',
       fontFamily: '"Press Start 2P"',
       fontStyle: 'bold',
-      stroke: '#ffffff',
-      strokeThickness: 5
+      stroke: '#ffcdb6ff',
+      strokeThickness: 7
     }).setOrigin(0.5);
 
     // Subtitle
     this.add.text(400, 270, 'Stack the cakes as high as you can!', {
-      fontSize: '24px',
-      fill: '#6d2b4bff',
-      fontFamily: 'Arial'
+    fontSize: '28px',
+    fill: '#c54e2aff',
+    stroke: '#ffcdb6ff',
+    strokeThickness: 3,
+    fontFamily: '"Bubblegum Sans"',
+    fontStyle: 'italic'
     }).setOrigin(0.5);
 
     // Instructions
     this.add.text(400, 380, 'Click or press SPACE to stack', {
-      fontSize: '20px',
-      fill: '#94426bff',
-      fontFamily: 'Arial',
-      fontStyle: 'italic'
+    fontSize: '24px',
+    fill: '#9b372bff',
+    fontFamily: '"Gloria Hallelujah"',
+    fontStyle: 'Bold Italic'
     }).setOrigin(0.5);
 
-<<<<<<< Updated upstream
-    // Start button
-
-    let stand = this.add.image(409, 495, 'cake1');
-    stand.setScale(0.5);
-    stand.setOrigin(0.5,0.5);
-
-    const startButton = stand;
-    //startButton.setStrokeStyle(4, 0x000000);
-=======
     // Start button with cake image
     let startButton = this.add.image(405, 500, 'cake-1');
     startButton.setScale(0.5);
     startButton.setOrigin(0.5, 0.5);
->>>>>>> Stashed changes
     startButton.setInteractive({ useHandCursor: true });
     
 
     const buttonText = this.add.text(400, 500, 'START GAME', {
       fontSize: '32px',
       fill: '#b6603eff',
-      stroke: '#000000ff',
+      stroke: '#552418ff',
       strokeThickness: 5,
       fontFamily: 'Arial',
       fontStyle: 'bold'
@@ -104,6 +83,16 @@ class StartScene extends Phaser.Scene {
   
 }
 
+ //get high score!
+
+    function getHighScore() {
+      return parseInt(localStorage.getItem('highScore')) || 0;
+    }
+
+    function setHighScore(score) {
+      localStorage.setItem('highScore', score);
+    }
+
 // Game Scene
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -112,36 +101,11 @@ class GameScene extends Phaser.Scene {
 
   preload() {
     this.load.image('background', 'assets/background.png');
-<<<<<<< Updated upstream
-    this.load.image('stand','assets/stand.png');
-
-    // cake images can be loaded here later
-  }
-
-  create() {
-    this.add.image(400, 390, 'background');
-    //this.add.image(400,390,'stand');
-    
-    let stand = this.add.image(400, 450, 'stand');
-    //stand.setScale(1.5);
-    //stand.setOrigin(0.5,0.5);
-
-  
-    // Game variables
-    this.score = 0;
-    this.blockHeight = 30;
-    this.blockWidth = 200;
-    this.load.image('cake1', 'images/cake1.png');
-    this.load.image('cake2', 'images/cake2.png');
-    this.load.image('cake3', 'images/cake3.png');
-    this.load.image('cake4', 'images/cake4.png');
-=======
     this.load.image('stand', 'assets/stand.png');
     this.load.image('cake1', 'images/cake1r.png');
     this.load.image('cake2', 'images/cake2r.png');
     this.load.image('cake3', 'images/cake3r.png');
     this.load.image('cake4', 'images/cake4r.png');
->>>>>>> Stashed changes
     
     // Error handling
     this.load.on('loaderror', (file) => {
@@ -323,11 +287,7 @@ class GameScene extends Phaser.Scene {
     
     // Increase difficulty
     this.speed = Math.min(400, this.speed + 5);
-<<<<<<< Updated upstream
-    if (this.score % 50 == 0){
-=======
     if (this.score % 50 === 0 && this.score > 0) {
->>>>>>> Stashed changes
       this.speed = Math.min(400, this.speed + 75);
     }
     
@@ -370,16 +330,6 @@ class GameOverScene extends Phaser.Scene {
     super('GameOverScene');
   }
 
-<<<<<<< Updated upstream
-  
-
-  create(data) {
-    // Background
-
-    this.add.image(400, 390, 'background');
-        
-    // this.add.rectangle(400, 400, 800, 800, 0xd9ffff);
-=======
   preload() {
     this.load.image('background', 'assets/background.png');
     this.load.image('cake2', 'assets/cake_2_render.png');
@@ -394,32 +344,51 @@ class GameOverScene extends Phaser.Scene {
 
   create(data) {
 
-        // Background
+           // Background
     this.add.image(400, 400, 'background');
 
 
+// --- HIGH SCORE LOGIC ---
+  let previousHighScore = getHighScore();
+  let isNewHighScore = data.score > previousHighScore;
+
+  // Save new high score if beaten
+  if (isNewHighScore) {
+    setHighScore(data.score);
+  }
+
+  // Choose correct value to DISPLAY
+  let highScoreToShow = isNewHighScore ? data.score : previousHighScore;
+
+  // --- Sprinkle Animation ONLY for new high score ---
+  if (isNewHighScore) {
     this.anims.create({
-        key: 'sprinkleAnim1',
-        frames: [
-            { key: 'sprinkles1' },
-            { key: 'sprinkles2' },
-            { key: 'sprinkles3' }
-        ],
-        frameRate: 10,
-        repeat: -1
+      key: 'sprinkleAnim1',
+      frames: [
+        { key: 'sprinkles1' },
+        { key: 'sprinkles2' },
+        { key: 'sprinkles3' }
+      ],
+      frameRate: 10,
+      repeat: -1
     });
-      
-    //create sprite
-    this.sprinkle1 = this.add.sprite(100, 700, 'sprinkles1');
+
+    this.sprinkle1 = this.add.sprite(400, 400, 'sprinkles1')
+      .setScale(2)
+      .setOrigin(0.5);
     this.sprinkle1.play('sprinkleAnim1');
+  }
 
-    this.sprinkle1.setScale(2);
+  // High score text (FIXED)
+  this.add.text(400, 410, 'High Score: ' + highScoreToShow, {
+    fontSize: '32px',
+    fill: '#fff267ff',
+    stroke: '#c5a042ff',
+    strokeThickness: 5,
+    fontFamily: '"Coiny"',
+    fontStyle: 'bold'
+  }).setOrigin(0.5);
 
-    this.sprinkle1.setOrigin(0.5);
-    this.sprinkle1.setPosition(this.scale.width / 2, this.scale.height / 2);
-
-
->>>>>>> Stashed changes
 
     // Game over text
     this.add.text(400, 250, 'GAME OVER', {
@@ -427,45 +396,31 @@ class GameOverScene extends Phaser.Scene {
       fill: '#ff0000',
       fontFamily: '"Press Start 2P"',
       fontStyle: 'bold',
-      stroke: '#ffffff',
+      stroke: '#aa0000ff',
       strokeThickness: 8
     }).setOrigin(0.5);
+
     
     // Final score
     this.add.text(400, 360, 'Final Score: ' + data.score, {
       fontSize: '40px',
-      fill: '#94426bff',
-      stroke: '#ffffff',
-      strokeThickness: 3,
+      fill: '#e23b3bff',
+      stroke: '#ffbbbbff',
+      strokeThickness: 5,
       fontFamily: 'Arial',
       fontStyle: 'bold'
     }).setOrigin(0.5);
     
-<<<<<<< Updated upstream
-    // Play again button
-    //const button = this.add.image(400, 500, 250, 70, 0x4CAF50);
-    //button.setStrokeStyle(4, 0x000000);
-    //button.setInteractive({ useHandCursor: true });
-
-    let button= this.add.image(410, 493, 'cake2');
-    button.setScale(0.5);
-    button.setOrigin(0.5,0.5);
-
-    const endButton = button;
-    //startButton.setStrokeStyle(4, 0x000000);
-    endButton.setInteractive({ useHandCursor: true });
-=======
     // Play again button with cake image
     let playButton = this.add.image(410, 493, 'cake-2');
     playButton.setScale(0.5);
     playButton.setOrigin(0.5, 0.5);
     playButton.setInteractive({ useHandCursor: true });
->>>>>>> Stashed changes
     
     const buttonText = this.add.text(410, 500, 'PLAY AGAIN', {
       fontSize: '32px',
       fill: '#b6603eff',
-      stroke: '#000000ff',
+      stroke: '#552418ff',
       strokeThickness: 5,
       fontFamily: 'Arial',
       fontStyle: 'bold'
@@ -475,31 +430,16 @@ class GameOverScene extends Phaser.Scene {
       this.scene.start('GameScene');
     });
 
-<<<<<<< Updated upstream
-    // Main menu button
-    //const menuButton = this.add.rectangle(400, 600, 250, 70, 0xff6b9d);
-    //menuButton.setStrokeStyle(4, 0x000000);
-    //menuButton.setInteractive({ useHandCursor: true });
-
-    let menuButton= this.add.image(408, 590, 'cake3');
-    menuButton.setScale(0.51);
-    menuButton.setOrigin(0.5,0.5);
-
-    const menButton = menuButton;
-    //startButton.setStrokeStyle(4, 0x000000);
-    menButton.setInteractive({ useHandCursor: true });
-=======
     // Main menu button with cake image
     let menuButton = this.add.image(408, 590, 'cake-3');
     menuButton.setScale(0.51);
     menuButton.setOrigin(0.5, 0.5);
     menuButton.setInteractive({ useHandCursor: true });
->>>>>>> Stashed changes
     
     const menuText = this.add.text(408, 600, 'MAIN MENU', {
       fontSize: '32px',
       fill: '#b6603eff',
-      stroke: '#000000ff',
+      stroke: '#552418ff',
       strokeThickness: 5,
       fontFamily: 'Arial',
       fontStyle: 'bold'
